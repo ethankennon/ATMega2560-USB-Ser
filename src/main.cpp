@@ -23,6 +23,7 @@ void loop() {
     // get incoming string:
     message = Serial.readString();
   }
+message.trim(); //removes whitespace from end
 
   if (message.equalsIgnoreCase("on")){
     digitalWrite(LED_BUILTIN, HIGH);    // turn the LED on (HIGH is the voltage level)
