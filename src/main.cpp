@@ -48,7 +48,7 @@ void loop() {
 
     message = '\n';
 /*
-    // read the remainder of the message to clear the serial buffer - holds for the timeout so can delay receipt of follow up commands
+    // read the remainder of the message to clear the serial buffer - holds for the serial timeout so can delay receipt of follow up commands
     while (Serial.available() > 0) {
       // get incoming string:
       String junk = Serial.readString();
