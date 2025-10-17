@@ -2,6 +2,7 @@
 
 // put function declarations here:
 char message = '\n';
+int new_state = -1; //used to track changes in the LED state
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -21,39 +22,55 @@ void loop() {
     // get incoming byte:
     message = Serial.read();
 
-    if (message == 'e' || message == 'E'){   //e for enable
-      digitalWrite(LED_BUILTIN, HIGH);    // turn the LED on (HIGH is the voltage level)
-      Serial.println("The LED is On.");   // tell the computer the LED is on
-    }
-    else if (message == 'd' || message == 'D'){  //d for disable
-      digitalWrite(LED_BUILTIN, LOW);     // turn the LED off by making the voltage LOW
-      Serial.println("The LED is Off.");  // tell the computer the LED is off
-    }
-    else if (message == 't' || message == 'T'){  //t for toggle
-      digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));     // turn the LED off by making the voltage LOW
-      if(digitalRead(LED_BUILTIN)){
-        Serial.println("The LED is On.");  // tell the computer the LED is off
-      }
-      else{
-        Serial.println("The LED is Off.");  // tell the computer the LED is off
-      }
-    }
-    else if (message == '\r' || message == '\n'){
-      // do nothing
-    }
-    else {
-      Serial.print("Unrecognized command:");
-      Serial.println(message);
+    switch (message){
+      case 'e':   //e for enable
+      case 'E':
+        digitalWrite(LED_BUILTIN, HIGH);    // turn the LED on (HIGH is the voltage level)
+        new_state = 1;
+        break;
+      case 'd':  //d for disable
+      case 'D':
+        digitalWrite(LED_BUILTIN, LOW);     // turn the LED off by making the voltage LOW
+        new_state = 0;
+        break;
+      case 'p':  //p for ping, just respond for timing purposes
+      case 'P':
+        Serial.println("P");  // quick response with no change to outputs
+        break;
+      case '\r':
+      case '\n':
+        break;
+      default:
+        Serial.print("Unrecognized command:");
+        Serial.println(message);
+        /*
+        // read the remainder of the message to clear the serial buffer - holds for the serial timeout so can delay receipt of follow up commands
+        while (Serial.available() > 0) {
+          // get incoming string:
+          String junk = Serial.readString();
+        } 
+        */
     }
 
-    message = '\n';
-/*
-    // read the remainder of the message to clear the serial buffer - holds for the serial timeout so can delay receipt of follow up commands
-    while (Serial.available() > 0) {
-      // get incoming string:
-      String junk = Serial.readString();
-    } 
-*/
+    //serial responses for state changes, eventually will be a separate input measuring the output of the relay
+    if (new_state == digitalRead(LED_BUILTIN)){
+      switch (new_state){
+        case 0:
+          Serial.println("0");  // tell the computer the LED is off
+          new_state = -1; //reset new_state
+          break;
+        case 1:
+          Serial.println("1");   // tell the computer the LED is on
+          new_state = -1; //reset new_state
+          break;
+        default:
+          //should never get here
+          digitalWrite(LED_BUILTIN, LOW);     // turn the LED off by making the voltage LOW
+      }
+    }
+
+    message = '\n'; //reset for when there is no new message
+
   }
 }
 
