@@ -3,6 +3,7 @@
 // put function declarations here:
 char message = '\n';
 int new_state = -1; //used to track changes in the LED state
+int new_state = -1; //used to track changes in the LED state
 
 // the setup function runs once when you press reset or power the board
 void setup() {
